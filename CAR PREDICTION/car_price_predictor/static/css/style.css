@@ -1,0 +1,17 @@
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+.card {
+    border-radius: 15px;
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+#prediction {
+    font-weight: bold;
+    color: #0b3d91;
+}

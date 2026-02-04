@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Price Predictor</title>
+
+    <!-- Bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    >
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="bg-dark">
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card mt-5 shadow-lg">
+                <div class="card-header text-center bg-primary text-white">
+                    <h3>🚗 Car Price Predictor</h3>
+                </div>
+
+                <div class="card-body">
+                    <form id="predictForm">
+
+                        <!-- Company -->
+                        <div class="form-group">
+                            <label><b>Select Company</b></label>
+                            <select class="form-control"
+                                    id="company"
+                                    name="company"
+                                    onchange="loadModels()"
+                                    required>
+                                {% for c in companies %}
+                                <option value="{{ c }}">{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Model -->
+                        <div class="form-group">
+                            <label><b>Select Car Model</b></label>
+                            <select class="form-control"
+                                    id="car_models"
+                                    name="car_models"
+                                    required>
+                            </select>
+                        </div>
+
+                        <!-- Year -->
+                        <div class="form-group">
+                            <label><b>Year of Purchase</b></label>
+                            <select class="form-control" name="year" required>
+                                {% for y in years %}
+                                <option value="{{ y }}">{{ y }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Fuel -->
+                        <div class="form-group">
+                            <label><b>Fuel Type</b></label>
+                            <select class="form-control" name="fuel_type" required>
+                                {% for f in fuel_types %}
+                                <option value="{{ f }}">{{ f }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- KM -->
+                        <div class="form-group">
+                            <label><b>Kilometers Driven</b></label>
+                            <input type="number"
+                                   class="form-control"
+                                   name="kilo_driven"
+                                   min="0"
+                                   required>
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-success btn-block"
+                                onclick="sendData()">
+                            🔍 Predict Price
+                        </button>
+                    </form>
+
+                    <hr>
+
+                    <h4 class="text-center text-primary" id="result"></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const companyModels = {{ company_models | tojson }};
+
+    function loadModels() {
+        let company = document.getElementById("company").value;
+        let modelSelect = document.getElementById("car_models");
+        modelSelect.innerHTML = "";
+
+        companyModels[company].forEach(model => {
+            let option = document.createElement("option");
+            option.value = model;
+            option.text = model;
+            modelSelect.appendChild(option);
+        });
+    }
+
+    loadModels();
+
+    function sendData() {
+        let form = document.getElementById("predictForm");
+        let data = new FormData(form);
+
+        document.getElementById("result").innerHTML =
+            "⏳ Predicting price...";
+
+        fetch("/predict", {
+            method: "POST",
+            body: data
+        })
+        .then(res => res.text())
+        .then(result => {
+            document.getElementById("result").innerHTML =
+                "💰 Estimated Price: ₹ " + result;
+        });
+    }
+</script>
+
+</body>
+</html>
